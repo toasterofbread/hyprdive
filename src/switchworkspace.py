@@ -80,7 +80,7 @@ def getMonitorName(left: bool) -> str:
 
 	return monitors[0]["name"]
 
-def switchWorkspace(left: bool):
+def switchWorkspace(left: bool, move_window: bool = False):
 	workspaces = getHyprctlOutput("workspaces")
 	original_workspace = getHyprctlOutput("activeworkspace")
 	monitor = original_workspace["monitor"]
@@ -100,7 +100,10 @@ def switchWorkspace(left: bool):
 		if not allow_switch:
 			return
 
-	os.system("hyprctl dispatch workspace " + ("r-1" if left else "r+1"))
+	command = "movetoworkspace" if move_window else "workspace"
+	target_workspace = "r-1" if left else "r+1"
+
+	os.system(f"hyprctl dispatch {command} {target_workspace}")
 	
 	data = getData()
 	if data is None or not monitor in data:
@@ -139,11 +142,14 @@ def switchWorkspace(left: bool):
 def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument("direction", choices=["left", "right"])
-	
+	parser.add_argument("-m", "--move", action="store_true")
+
 	args = parser.parse_args()
 	
+	move_window = args.move
 	left = args.direction == "left"
-	switchWorkspace(left)
+
+	switchWorkspace(left, move_window)
 
 if __name__ == "__main__":
 	main()
