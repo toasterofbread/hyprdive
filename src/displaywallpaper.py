@@ -23,7 +23,7 @@ def getHyprctlOutput(command: str) -> str:
 
 def getMonitorName(left: bool) -> str:
 	target_pos = 0 if left else 1920
-	
+
 	monitors: list[dict] = getHyprctlOutput("monitors")
 	for monitor in monitors:
 		if monitor["x"] == target_pos:
@@ -52,12 +52,12 @@ def setLiveWallpaper(left: bool, path: str):
 	video = join(os.path.dirname(path), data["video"])
 
 	socket = "/tmp/wp-" + monitor
-	options = "input-ipc-server=" + socket
+	options = f"input-ipc-server={socket} --no-osd-bar"
 
 	loop_position = data.get("loop-position")
 	if loop_position is not None:
 		options += " --ab-loop-a=" + data["loop-position"]
-		
+
 		duration = getVideoDuration(video).removeprefix("00:")
 		options += " --ab-loop-b=" + duration
 
@@ -135,7 +135,7 @@ def getRandomWallpaper(directory: str, used_files: list):
 			f = open(file_path, "r")
 			set_content = f.read().strip()
 			f.close()
-			
+
 			set_path = join(SETS_DIR, set_content)
 
 			if not os.path.isdir(set_path):
@@ -177,7 +177,7 @@ def main():
 			if file is not None:
 				wallpapers[side[0]] = file
 				return
-		
+
 		wallpapers[side[0]] = getRandomWallpaper(MAIN_DIR, used)
 
 	for side in (("left", LEFT_DIR), ("right", RIGHT_DIR)):
