@@ -37,7 +37,7 @@ def setImageWallpaper(left: bool, path: str) -> subprocess.Popen:
 
 def setVideoWallpaper(left: bool, path: str):
 	monitor = getMonitorName(left)
-	return subprocess.Popen(["mpvpaper", monitor, path])
+	return subprocess.Popen(["mpvpaper", "-o", "--speed=1", monitor, path])
 
 def getVideoDuration(path: str):
 	return subprocess.check_output(f"ffmpeg -i {path} 2>&1 | grep \"Duration\"| cut -d ' ' -f 4 | sed s/,//", shell = True).decode().strip()
@@ -52,7 +52,7 @@ def setLiveWallpaper(left: bool, path: str):
 	video = join(os.path.dirname(path), data["video"])
 
 	socket = "/tmp/wp-" + monitor
-	options = f"input-ipc-server={socket} --no-osd-bar"
+	options = f"input-ipc-server={socket} --no-osd-bar --speed=1"
 
 	loop_position = data.get("loop-position")
 	if loop_position is not None:
