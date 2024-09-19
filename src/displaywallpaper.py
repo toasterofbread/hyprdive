@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/etc/profiles/per-user/toaster/bin/python
 
 import os
 import json
@@ -54,12 +54,17 @@ def setLiveWallpaper(left: bool, path: str):
 	socket = "/tmp/wp-" + monitor
 	options = f"input-ipc-server={socket} --no-osd-bar --speed=1"
 
+	duration = getVideoDuration(video).removeprefix("00:")
 	loop_position = data.get("loop-position")
-	if loop_position is not None:
-		options += " --ab-loop-a=" + data["loop-position"]
 
-		duration = getVideoDuration(video).removeprefix("00:")
+	if loop_position is not None:
+		options += " --ab-loop-a=" + loop_position
 		options += " --ab-loop-b=" + duration
+	else:
+		options += " --ab-loop-a=0"
+		options += " --ab-loop-b=" + duration
+
+	print(options)
 
 	writeLiveData(monitor, socket, path)
 

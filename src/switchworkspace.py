@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/etc/profiles/per-user/toaster/bin/python
 
 import os
 import json
