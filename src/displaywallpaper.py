@@ -1,8 +1,10 @@
-#!/etc/profiles/per-user/toaster/bin/python
+#!/usr/bin/python3
 
 import os
 import json
 import subprocess
+import time
+from argparse import ArgumentParser
 from random import randrange, seed
 from os.path import join, expanduser
 
@@ -171,6 +173,12 @@ def getRandomWallpaper(directory: str, used_files: list):
 	return None
 
 def main():
+	parser = ArgumentParser()
+	parser.add_argument("-d", "--delay", type=int, default=0)
+	args = parser.parse_args()
+
+	time.sleep(args.delay)
+
 	seed()
 
 	wallpapers = {"left": "", "right": ""}
