@@ -24,17 +24,16 @@ def getHyprctlOutput(command: str) -> str:
 	return json.loads(subprocess.check_output(f"hyprctl {command} -j", shell = True))
 
 def getMonitorName(left: bool) -> str:
-	target_pos = 0 if left else 1920
-
 	monitors: list[dict] = getHyprctlOutput("monitors")
 	for monitor in monitors:
-		if monitor["x"] == target_pos:
+		if (monitor["x"] == 0) == left:
 			return monitor["name"]
 
 	return monitors[0]["name"]
 
 def setImageWallpaper(left: bool, path: str) -> subprocess.Popen:
 	monitor = getMonitorName(left)
+	print(f"Running swaybg -o {monitor} -i {path}")
 	return subprocess.Popen(["swaybg", "-o", monitor, "-i", path])
 
 def setVideoWallpaper(left: bool, path: str):
