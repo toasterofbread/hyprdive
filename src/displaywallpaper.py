@@ -5,13 +5,11 @@ import json
 import subprocess
 import time
 from argparse import ArgumentParser
-from random import randrange, seed
+from random import seed
 from os.path import join, expanduser
+from wallpapers import getRandomWallpaper, WALLPAPER_DIR, updateUsedFilesList
 
 LIVE_DATA_FILE = expanduser("~/.wallpaperlaunch")
-
-WALLPAPER_DIR = expanduser("~/Media/Wallpapers/")
-SETS_DIR = expanduser("~/Media/Wallpapers/Sets")
 
 VIDEO_FILETYPES = ["mp4"]
 LIVE_FILETYPES = ["live"]
@@ -129,48 +127,6 @@ def setWallpapers(left_path: str, right_path: str):
 		if right_proc is not None:
 			right_proc.kill()
 
-def getRandomWallpaper(directory: str, used_files: list):
-	files = []
-
-	for file in os.listdir(directory):
-		if file.startswith("."):
-			continue
-
-		file_path = join(directory, file)
-		if file.endswith(".set"):
-			f = open(file_path, "r")
-			set_content = f.read().strip()
-			f.close()
-
-			set_path = join(SETS_DIR, set_content)
-
-			if not os.path.isdir(set_path):
-				print("Set not found: " + set_path)
-				continue
-
-			for set_file in os.listdir(set_path):
-				if set_file.startswith("."):
-					continue
-
-				set_file_path = join(set_path, set_file)
-				if set_file_path in used_files:
-					continue
-				files.append(set_file_path)
-
-			continue
-
-		if file_path in used_files:
-			continue
-
-		files.append(file_path)
-
-	if len(files) > 0:
-		ret = files[randrange(len(files))]
-		used_files.append(ret)
-		return ret
-
-	return None
-
 def main():
 	parser = ArgumentParser()
 	parser.add_argument("-d", "--delay", type=int, default=0)
@@ -185,18 +141,20 @@ def main():
 
 	def getSide(side, used):
 		if os.path.isdir(side[1]):
-			file = getRandomWallpaper(side[1], used)
+			file = getRandomWallpaper(directory = side[1], used_files = used)
 			if file is not None:
 				wallpapers[side[0]] = file
 				return
 
-		wallpapers[side[0]] = getRandomWallpaper(MAIN_DIR, used)
+		wallpapers[side[0]] = getRandomWallpaper(directory = MAIN_DIR, used_files = used)
 
 	for side in (("left", LEFT_DIR), ("right", RIGHT_DIR)):
 		getSide(side, used_files)
 
 	if wallpapers["right"] is None:
 		getSide(("right", RIGHT_DIR), [])
+
+	updateUsedFilesList(used_files)
 
 	print(wallpapers)
 
